@@ -1,571 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Collaborative Problem Bank</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <link rel="stylesheet" href="index.css">
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(45deg, #2196F3, #21CBF3);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-
-        .user-info {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            text-align: right;
-        }
-
-        .user-info .username {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .logout-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 5px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* Auth Forms */
-        .auth-container {
-            max-width: 400px;
-            margin: 50px auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .auth-header {
-            background: linear-gradient(45deg, #2196F3, #21CBF3);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .auth-form {
-            padding: 30px;
-        }
-
-        .auth-form .form-group {
-            margin-bottom: 20px;
-        }
-
-        .auth-form label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .auth-form input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-
-        .auth-form input:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-        }
-
-        .auth-toggle {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .auth-toggle a {
-            color: #007bff;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .auth-toggle a:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            display: none;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-
-        .nav-tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .tab-button {
-            flex: 1;
-            padding: 15px 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            transition: all 0.3s ease;
-        }
-
-        .tab-button:hover {
-            background: #e9ecef;
-        }
-
-        .tab-button.active {
-            background: #007bff;
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 30px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-danger {
-            background: linear-gradient(45deg, #dc3545, #c82333);
-        }
-
-        .btn-danger:hover {
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(45deg, #6c757d, #545b62);
-        }
-
-        .btn-secondary:hover {
-            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
-        }
-
-        .users-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .user-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            transition: transform 0.3s ease;
-            cursor: pointer;
-        }
-
-        .user-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .user-card h3 {
-            font-size: 1.5em;
-            margin-bottom: 15px;
-        }
-
-        .user-card .stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 15px 0;
-        }
-
-        .user-card .stat {
-            text-align: center;
-        }
-
-        .user-card .stat-number {
-            font-size: 1.8em;
-            font-weight: bold;
-        }
-
-        .user-card .stat-label {
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .search-box input,
-        .search-box select {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .problem-card {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .problem-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-
-        .problem-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-            gap: 15px;
-        }
-
-        .problem-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #333;
-            flex: 1;
-        }
-
-        .problem-author {
-            font-size: 0.9em;
-            color: #007bff;
-            font-weight: 500;
-        }
-
-        .problem-badges {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .badge-easy { background: #d4edda; color: #155724; }
-        .badge-medium { background: #fff3cd; color: #856404; }
-        .badge-hard { background: #f8d7da; color: #721c24; }
-        .badge-topic { background: #e2e3e5; color: #495057; }
-        .badge-source { background: #cce5ff; color: #004085; }
-
-        .problem-meta {
-            color: #666;
-            font-size: 13px;
-            margin-bottom: 15px;
-        }
-
-        .problem-content {
-            margin-bottom: 15px;
-        }
-
-        .problem-content h4 {
-            margin-bottom: 8px;
-            color: #495057;
-        }
-
-        .problem-content p {
-            line-height: 1.6;
-            color: #666;
-        }
-
-        .problem-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            opacity: 0.9;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #666;
-        }
-
-        .empty-state h3 {
-            margin-bottom: 15px;
-            color: #495057;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-        }
-
-        .user-selector {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .user-selector select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .back-btn {
-            margin-bottom: 20px;
-        }
-
-        .realtime-indicator {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #28a745;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            z-index: 1001;
-            display: none;
-        }
-
-        .realtime-indicator.connected {
-            display: block;
-        }
-
-        .realtime-indicator.disconnected {
-            background: #dc3545;
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .user-info {
-                position: static;
-                text-align: center;
-                margin-top: 15px;
-            }
-            
-            .nav-tabs {
-                flex-wrap: wrap;
-            }
-            
-            .tab-button {
-                flex: 1 1 50%;
-                min-width: 120px;
-            }
-            
-            .search-box {
-                flex-direction: column;
-            }
-            
-            .problem-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .problem-actions {
-                flex-wrap: wrap;
-            }
-
-            .users-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
+
 <body>
     <!-- Real-time connection indicator -->
     <div id="realtimeIndicator" class="realtime-indicator">
@@ -583,7 +27,7 @@
             <div class="loading" id="authLoading">
                 <p>⏳ Processing...</p>
             </div>
-            
+
             <form id="authForm">
                 <div class="form-group">
                     <label for="authUsername">Username</label>
@@ -599,7 +43,7 @@
                 </div>
                 <button type="submit" class="btn" style="width: 100%;" id="authSubmitBtn">Login</button>
             </form>
-            
+
             <div class="auth-toggle">
                 <span id="authToggleText">Don't have an account?</span>
                 <a id="authToggleLink">Sign up here</a>
@@ -610,20 +54,44 @@
     <!-- Main Application -->
     <div id="mainApp" class="container" style="display: none;">
         <div class="header">
-            <h1>🎯 Collaborative Problem Bank</h1>
+            <h1>🎯 Competitive Programming Bank</h1>
             <p>Share and discover competitive programming problems with the community</p>
             <div class="user-info">
                 <div class="username" id="currentUser"></div>
-                <button class="logout-btn" onclick="logout()">Logout</button>
+                <button class="logout-btn" onclick="logout()">
+                    <div class="sign"><svg viewBox="0 0 512 512">
+                            <path
+                                d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z">
+                            </path>
+                        </svg></div>
+
+                    <div class="text">Logout</div>
+                </button>
             </div>
         </div>
 
         <nav class="nav-tabs">
-            <button class="tab-button active" onclick="showTab('community')">🌍 Community</button>
-            <button class="tab-button" onclick="showTab('my-problems')">📝 My Problems</button>
-            <button class="tab-button" onclick="showTab('add')">➕ Add Problem</button>
-            <button class="tab-button" onclick="showTab('search')">🔍 Search</button>
-            <button class="tab-button" onclick="showTab('stats')">📊 Statistics</button>
+            <!-- From Uiverse.io by Voxybuns -->
+            <button class="active" onclick="showTab('community')">
+                <span class="button_top">🌍 Community</span>
+            </button>
+
+            <button onclick="showTab('my-problems')">
+                <span class="button_top">📝 My Problems</span>
+            </button>
+
+            <button onclick="showTab('add')">
+                <span class="button_top">➕ Add Problem</span>
+            </button>
+
+            <button onclick="showTab('search')">
+                <span class="button_top">🔍 Search</span>
+            </button>
+
+            <button onclick="showTab('stats')">
+                <span class="button_top">📊 Statistics</span>
+            </button>
+
         </nav>
 
         <!-- Community Tab -->
@@ -648,7 +116,7 @@
             <div class="success-message" id="successMessage">
                 ✅ Problem added successfully!
             </div>
-            
+
             <form id="addProblemForm">
                 <div class="form-group">
                     <label for="title">Problem Title *</label>
@@ -682,12 +150,14 @@
 
                 <div class="form-group">
                     <label for="solution">Your Solution Approach</label>
-                    <textarea id="solution" placeholder="Explain your approach, algorithm, time complexity..."></textarea>
+                    <textarea id="solution"
+                        placeholder="Explain your approach, algorithm, time complexity..."></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="notes">Additional Notes (Optional)</label>
-                    <textarea id="notes" rows="3" placeholder="Any additional thoughts, tricks, or reminders..."></textarea>
+                    <textarea id="notes" rows="3"
+                        placeholder="Any additional thoughts, tricks, or reminders..."></textarea>
                 </div>
 
                 <button type="submit" class="btn" id="addProblemBtn">💾 Save Problem</button>
@@ -703,7 +173,7 @@
                     <option value="mine">My Problems Only</option>
                 </select>
             </div>
-            
+
             <div class="search-box">
                 <input type="text" id="searchQuery" placeholder="Search problems...">
                 <select id="searchFilter">
@@ -764,7 +234,7 @@
         // REPLACE THESE WITH YOUR ACTUAL SUPABASE PROJECT CREDENTIALS
         const SUPABASE_URL = 'https://gbjcgnyimvhetfgbofmq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdiamNnbnlpbXZoZXRmZ2JvZm1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyMzgzMzQsImV4cCI6MjA3MDgxNDMzNH0.W4eJfUbJtIRs16IXPFoqE9SuePGTudpGEkmxgngsVQQ';
-        
+
         // Initialize Supabase client
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -776,7 +246,7 @@
         let usersCache = new Map();
 
         // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             setupAuthForm();
             checkAuthState();
             setupRealtimeSubscriptions();
@@ -786,7 +256,7 @@
         function checkAuthState() {
             supabase.auth.onAuthStateChange((event, session) => {
                 currentSession = session;
-                
+
                 if (event === 'SIGNED_IN' && session) {
                     currentUser = session.user.user_metadata.username || session.user.email;
                     updateRealtimeIndicator('connected');
@@ -815,7 +285,7 @@
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             document.getElementById('currentUser').textContent = currentUser;
-            
+
             // Load initial data
             displayCommunity();
             displayMyProblems();
@@ -845,7 +315,7 @@
                 toggleText.textContent = 'Already have an account?';
                 toggleLink.textContent = 'Login here';
             }
-            
+
             // Clear form
             document.getElementById('authForm').reset();
             hideError();
@@ -872,7 +342,7 @@
                         email: email,
                         password: password,
                     });
-                    
+
                     if (error) throw error;
                 } else {
                     // Sign up
@@ -885,9 +355,9 @@
                             }
                         }
                     });
-                    
+
                     if (error) throw error;
-                    
+
                     // Create user profile in database
                     // const { error: profileError } = await supabase
                     //     .from('users')
@@ -898,11 +368,11 @@
                     //             email: email
                     //         }
                     //     ]);
-                    
+
                     // if (profileError && !profileError.message.includes('duplicate')) {
                     //     throw profileError;
                     // }
-                    
+
                     if (data.user && !data.session) {
                         showError('Please check your email to confirm your account before logging in.');
                         return;
@@ -947,7 +417,7 @@
             // Subscribe to problems changes
             problemsSubscription = supabase
                 .channel('problems_changes')
-                .on('postgres_changes', 
+                .on('postgres_changes',
                     { event: '*', schema: 'public', table: 'problems' },
                     (payload) => {
                         console.log('Problems change:', payload);
@@ -967,9 +437,9 @@
         function refreshCurrentView() {
             const activeTab = document.querySelector('.tab-content.active');
             if (!activeTab) return;
-            
+
             const tabId = activeTab.id;
-            switch(tabId) {
+            switch (tabId) {
                 case 'community':
                     displayCommunity();
                     break;
@@ -999,7 +469,7 @@
                         }
                     ])
                     .select();
-                
+
                 if (error) throw error;
                 return data[0];
             } catch (error) {
@@ -1014,25 +484,25 @@
                     .from('problems')
                     .select('*')
                     .order('date_added', { ascending: false });
-                
+
                 if (filters.author) {
                     query = query.eq('author', filters.author);
                 }
-                
+
                 if (filters.difficulty) {
                     query = query.eq('difficulty', filters.difficulty);
                 }
-                
+
                 if (filters.topic) {
                     query = query.ilike('topic', `%${filters.topic}%`);
                 }
-                
+
                 if (filters.search) {
                     query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,topic.ilike.%${filters.search}%,source.ilike.%${filters.search}%`);
                 }
-                
+
                 const { data, error } = await query;
-                
+
                 if (error) throw error;
                 return data || [];
             } catch (error) {
@@ -1048,7 +518,7 @@
                     .delete()
                     .eq('id', problemId)
                     .eq('author', currentUser);
-                
+
                 if (error) throw error;
                 return true;
             } catch (error) {
@@ -1063,7 +533,7 @@
                     .from('users')
                     .select('*')
                     .order('join_date', { ascending: false });
-                
+
                 if (error) throw error;
                 return data || [];
             } catch (error) {
@@ -1078,7 +548,7 @@
                     .from('problems')
                     .select('*', { count: 'exact', head: true })
                     .eq('author', username);
-                
+
                 if (error) throw error;
                 return count || 0;
             } catch (error) {
@@ -1093,7 +563,7 @@
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
+
             // Remove active class from all buttons
             document.querySelectorAll('.tab-button').forEach(btn => {
                 btn.classList.remove('active');
@@ -1114,7 +584,7 @@
             }
 
             // Load content based on tab
-            switch(tabName) {
+            switch (tabName) {
                 case 'community':
                     displayCommunity();
                     break;
@@ -1135,13 +605,13 @@
         async function displayCommunity() {
             const container = document.getElementById('usersGrid');
             const loadingDiv = document.getElementById('communityLoading');
-            
+
             showLoading('communityLoading');
             container.innerHTML = '';
-            
+
             try {
                 const users = await getUsers();
-                
+
                 if (users.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
@@ -1206,11 +676,11 @@
             const headerDiv = document.getElementById('profileHeader');
             const problemsDiv = document.getElementById('profileProblems');
             const loadingDiv = document.getElementById('profileLoading');
-            
+
             showLoading('profileLoading');
             headerDiv.innerHTML = '';
             problemsDiv.innerHTML = '';
-            
+
             try {
                 // Get user info
                 const { data: userData, error: userError } = await supabase
@@ -1223,7 +693,7 @@
 
                 // Get user's problems
                 const userProblems = await getProblems({ author: username });
-                
+
                 headerDiv.innerHTML = `
                     <div class="user-card" style="margin-bottom: 30px;">
                         <h2>👤 ${username}'s Profile</h2>
@@ -1240,7 +710,7 @@
 
                 problemsDiv.innerHTML = `
                     <h3>📝 ${username}'s Problems</h3>
-                    ${userProblems.length === 0 ? 
+                    ${userProblems.length === 0 ?
                         '<div class="empty-state"><p>No problems shared yet.</p></div>' :
                         userProblems.map(problem => createProblemCard(problem, false)).join('')
                     }
@@ -1260,15 +730,15 @@
         }
 
         // Problem form handling
-        document.getElementById('addProblemForm').addEventListener('submit', async function(e) {
+        document.getElementById('addProblemForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const submitBtn = document.getElementById('addProblemBtn');
             const originalText = submitBtn.textContent;
-            
+
             submitBtn.disabled = true;
             submitBtn.textContent = '⏳ Saving...';
-            
+
             const problem = {
                 title: document.getElementById('title').value.trim(),
                 source: document.getElementById('source').value.trim(),
@@ -1281,7 +751,7 @@
 
             try {
                 await addProblem(problem);
-                
+
                 // Show success message
                 const successMsg = document.getElementById('successMessage');
                 successMsg.style.display = 'block';
@@ -1304,13 +774,13 @@
         async function displayMyProblems() {
             const container = document.getElementById('myProblemsList');
             const loadingDiv = document.getElementById('myProblemsLoading');
-            
+
             showLoading('myProblemsLoading');
             container.innerHTML = '';
-            
+
             try {
                 const myProblems = await getProblems({ author: currentUser });
-                
+
                 if (myProblems.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
@@ -1338,7 +808,7 @@
         function createProblemCard(problem, showActions = true) {
             const difficultyClass = problem.difficulty ? `badge-${problem.difficulty.toLowerCase()}` : 'badge-topic';
             const dateAdded = problem.date_added ? new Date(problem.date_added).toLocaleString() : 'Unknown';
-            
+
             return `
                 <div class="problem-card">
                     <div class="problem-header">
@@ -1365,7 +835,7 @@
         // View problem details in modal
         function viewProblem(id) {
             const problems = JSON.parse(document.querySelector(`[onclick="viewProblem('${id}')"]`).closest('.problem-card').dataset.problem || '{}');
-            
+
             // Since we don't store the full problem data in the card, we need to find it from our current data
             // This is a simplified approach - in a real app, you'd fetch by ID from the database
             getProblems().then(allProblems => {
@@ -1413,11 +883,11 @@
                 const users = await getUsers();
                 const searchUserFilter = document.getElementById('searchUserFilter');
                 const statsUserFilter = document.getElementById('statsUserFilter');
-                
-                const userOptions = users.map(user => 
+
+                const userOptions = users.map(user =>
                     `<option value="${user.username}">${user.username}</option>`
                 ).join('');
-                
+
                 if (searchUserFilter) {
                     searchUserFilter.innerHTML = `
                         <option value="all">All Users</option>
@@ -1425,7 +895,7 @@
                         ${userOptions}
                     `;
                 }
-                
+
                 if (statsUserFilter) {
                     statsUserFilter.innerHTML = `
                         <option value="all">All Users Combined</option>
@@ -1444,7 +914,7 @@
             const searchFilter = document.getElementById('searchFilter').value;
             const resultsContainer = document.getElementById('searchResults');
             const loadingDiv = document.getElementById('searchLoading');
-            
+
             if (!query) {
                 resultsContainer.innerHTML = '<p>Please enter a search term.</p>';
                 return;
@@ -1455,7 +925,7 @@
 
             try {
                 const filters = {};
-                
+
                 // Apply user filter
                 if (userFilter === 'mine') {
                     filters.author = currentUser;
@@ -1474,7 +944,7 @@
                         const fieldValue = problem[searchFilter];
                         return fieldValue && fieldValue.toLowerCase().includes(query);
                     });
-                    
+
                     displaySearchResults(results);
                     return;
                 }
@@ -1490,7 +960,7 @@
 
         function displaySearchResults(results) {
             const container = document.getElementById('searchResults');
-            
+
             if (results.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
@@ -1512,14 +982,14 @@
             const statsGrid = document.getElementById('statsGrid');
             const detailedStats = document.getElementById('detailedStats');
             const loadingDiv = document.getElementById('statsLoading');
-            
+
             showLoading('statsLoading');
             statsGrid.innerHTML = '';
             detailedStats.innerHTML = '';
-            
+
             try {
                 let statsProblems = [];
-                
+
                 if (statsFilter === 'mine') {
                     statsProblems = await getProblems({ author: currentUser });
                 } else if (statsFilter !== 'all') {
@@ -1527,7 +997,7 @@
                 } else {
                     statsProblems = await getProblems();
                 }
-                
+
                 if (statsProblems.length === 0) {
                     statsGrid.innerHTML = `
                         <div class="empty-state">
@@ -1544,7 +1014,7 @@
                     acc[p.difficulty || 'Unknown'] = (acc[p.difficulty || 'Unknown'] || 0) + 1;
                     return acc;
                 }, {});
-                
+
                 const topics = statsProblems.reduce((acc, p) => {
                     acc[p.topic || 'Unknown'] = (acc[p.topic || 'Unknown'] || 0) + 1;
                     return acc;
@@ -1587,40 +1057,40 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                         <div class="problem-card">
                             <h3>By Difficulty</h3>
-                            ${Object.entries(difficulties).map(([diff, count]) => 
-                                `<p><strong>${diff}:</strong> ${count} problems</p>`
-                            ).join('')}
+                            ${Object.entries(difficulties).map(([diff, count]) =>
+                    `<p><strong>${diff}:</strong> ${count} problems</p>`
+                ).join('')}
                         </div>
                         <div class="problem-card">
                             <h3>By Topic</h3>
-                            ${Object.entries(topics).slice(0, 10).map(([topic, count]) => 
-                                `<p><strong>${topic}:</strong> ${count} problems</p>`
-                            ).join('')}
+                            ${Object.entries(topics).slice(0, 10).map(([topic, count]) =>
+                    `<p><strong>${topic}:</strong> ${count} problems</p>`
+                ).join('')}
                             ${Object.keys(topics).length > 10 ? '<p><em>...and more</em></p>' : ''}
                         </div>
                         <div class="problem-card">
                             <h3>By Source</h3>
-                            ${Object.entries(sources).slice(0, 10).map(([source, count]) => 
-                                `<p><strong>${source}:</strong> ${count} problems</p>`
-                            ).join('')}
+                            ${Object.entries(sources).slice(0, 10).map(([source, count]) =>
+                    `<p><strong>${source}:</strong> ${count} problems</p>`
+                ).join('')}
                             ${Object.keys(sources).length > 10 ? '<p><em>...and more</em></p>' : ''}
                         </div>
                 `;
-                
+
                 if (statsFilter === 'all') {
                     detailedHtml += `
                         <div class="problem-card">
                             <h3>Top Contributors</h3>
                             ${Object.entries(authors)
-                                .sort(([,a], [,b]) => b - a)
-                                .slice(0, 10)
-                                .map(([author, count]) => 
-                                    `<p><strong>${author}:</strong> ${count} problems</p>`
-                                ).join('')}
+                            .sort(([, a], [, b]) => b - a)
+                            .slice(0, 10)
+                            .map(([author, count]) =>
+                                `<p><strong>${author}:</strong> ${count} problems</p>`
+                            ).join('')}
                         </div>
                     `;
                 }
-                
+
                 detailedHtml += '</div>';
                 detailedStats.innerHTML = detailedHtml;
             } catch (error) {
@@ -1636,14 +1106,14 @@
         }
 
         // Event listeners
-        document.getElementById('searchQuery').addEventListener('keypress', function(e) {
+        document.getElementById('searchQuery').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 searchProblems();
             }
         });
 
         // Close modal when clicking outside
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('problemModal');
             if (event.target === modal) {
                 closeModal();
@@ -1651,7 +1121,7 @@
         }
 
         // Initialize app after DOM is loaded
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             // Check if Supabase credentials are configured
             if (SUPABASE_URL.includes('your-project-id') || SUPABASE_ANON_KEY.includes('your-anon')) {
                 document.body.innerHTML = `
@@ -1710,7 +1180,7 @@ CREATE POLICY "Users can delete their own problems" ON problems FOR DELETE USING
                 `;
                 return;
             }
-            
+
             populateUserFilters();
         });
     </script>
